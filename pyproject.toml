@@ -1,0 +1,62 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "2023-autumn-ab-python-cicd-hw6-to-n-y"
+version = "0.1.0"
+description = ""
+authors = ["Tony <realvitl@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = "^0.24.0.post1"
+starlette = "^0.34.0"
+python-dotenv = "^1.0.0"
+passlib = "^1.7.4"
+bcrypt = "4.0.1"
+pyjwt = "^2.8.0"
+itsdangerous = "^2.1.2"
+starlette-apispec = "^2.2.0"
+marshmallow = "^3.20.1"
+bandit = "^1.7.6"
+pydantic = "^2.5.2"
+flake8 = "^6.1.0"
+isort = "^5.13.2"
+
+
+[tool.poetry.dev-dependencies]
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.12.0"
+bandit = "^1.7.6"
+
+[build]
+script = "poetry build"
+
+[tool.black]
+line-length = 79
+skip-string-normalization = true
+
+[flake8]
+ban-todos = true
+max-line-length = 120
+extend-ignore = [
+    "W291"
+]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers -W error"
+junit_family = "xunit2"
+testpaths = ["tests"]
+xfail_strict = true
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning"
+]
+
+[tool.mypy]
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+strict = true
