@@ -9,7 +9,7 @@ from src.handlers.task_handlers import (
     task_by_id,
     update_task,
 )
-from src.handlers.user_handlers import user_login, user_register
+from src.handlers.user_handlers import user_login, user_logout, user_register
 
 task_prefix = conf.api_prefix + 'task/'
 list_prefix = conf.api_prefix + 'list'
@@ -38,10 +38,10 @@ task_routes = [
         ],
     ),  # delete task
     Route(
-        '/',
+        '/all',
         all_tasks,
         methods=[
-            'GET',
+            'POST',
         ],
     ),  # get all tasks
     Route(
@@ -87,4 +87,7 @@ routes = [
         name="user__register",
     ),
     Route("/login", endpoint=user_login, methods=["POST"], name="user__login"),
+    Route(
+        "/logout", endpoint=user_logout, methods=["POST"], name="user__logout"
+    ),
 ]

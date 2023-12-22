@@ -3,12 +3,17 @@ from json import JSONDecodeError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
+from starlette.templating import Jinja2Templates
 
 from src.services.list_service import ListService
 
+templates = Jinja2Templates(directory="frontend")
+
 
 async def homepage(request):
-    return "Ping!"
+    return templates.TemplateResponse(
+        "home.html", {"request": request, "user": None}
+    )
 
 
 async def delete_list(request):

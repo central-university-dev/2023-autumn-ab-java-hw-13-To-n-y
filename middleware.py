@@ -41,25 +41,29 @@ class JWTAuthenticationBackend(AuthenticationBackend):
     async def authenticate(self, request):
         if "Authorization" not in request.headers:
             return None
-        authorization = request.headers["Authorization"]
-        token = self.get_token_from_header(
-            authorization=authorization, prefix=self.prefix
-        )
-        try:
-            jwt_payload = decode_token(token)
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationError("Expired JWT token")
-        except jwt.InvalidTokenError:
-            raise AuthenticationError("Invalid JWT token")
-        return (
-            AuthCredentials(["authenticated"]),
-            JWTUser(
-                username=jwt_payload["username"],
-                user_id=jwt_payload["user_id"],
-                email=jwt_payload["email"],
-                token=token,
-            ),
-        )
+        content_type = request.headers['content-type']
+        if content_type == 'application/json':
+            authorization = request.headers["Authorization"]
+            token = self.get_token_from_header(
+                authorization=authorization, prefix=self.prefix
+            )
+            try:
+                jwt_payload = decode_token(token)
+            except jwt.ExpiredSignatureError:
+                raise AuthenticationError("Expired JWT token")
+            except jwt.InvalidTokenError:
+                raise AuthenticationError("Invalid JWT token")
+            return (
+                AuthCredentials(["authenticated"]),
+                JWTUser(
+                    username=jwt_payload["username"],
+                    user_id=jwt_payload["user_id"],
+                    email=jwt_payload["email"],
+                    token=token,
+                ),
+            )
+        elif content_type == 'text/plain':
+            ...
 
 
 middleware = [

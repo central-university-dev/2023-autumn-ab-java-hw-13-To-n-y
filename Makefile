@@ -8,7 +8,7 @@ install:
 	poetry install
 
 run:
-	uvicorn main:app
+	uvicorn main:app --reload
 
 format:
 	poetry run black --line-length 79 --skip-string-normalization $(CODE_FOLDERS) $(TEST_FOLDERS)

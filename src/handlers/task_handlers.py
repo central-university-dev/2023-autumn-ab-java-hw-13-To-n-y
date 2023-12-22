@@ -3,10 +3,13 @@ from json import JSONDecodeError
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
+from starlette.templating import Jinja2Templates
 
 from src.services.list_service import ListService
 from src.services.task_service import TaskService
 from src.services.user_service import UserService
+
+templates = Jinja2Templates(directory="frontend")
 
 
 async def task_by_id(request):
@@ -33,12 +36,19 @@ async def task_by_id(request):
 
 
 async def all_tasks(request):
-    if 'authenticated' not in request.auth.scopes:
-        raise HTTPException(
-            status_code=HTTP_403_FORBIDDEN, detail="Authenticate first!"
-        )
+    print(request.session)
     try:
-        curr_user_id = request.user.user_id
+        print("START", request.headers)
+        content_type = request.headers['content-type']
+        if content_type == 'text/plain':
+            curr_user_id = request.session['user_id']
+        elif content_type == 'application/json':
+            if 'authenticated' not in request.auth.scopes:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail="Authenticate first!",
+                )
+            curr_user_id = request.user.user_id
     except JSONDecodeError:
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST, detail="Can't parse payload"
@@ -50,19 +60,52 @@ async def all_tasks(request):
         )
     all_tasks = TaskService().get_all_tasks()
     dump_tasks = [task.model_dump() for task in all_tasks]
+    if content_type == 'text/plain':
+        return templates.TemplateResponse(
+            "all_tasks.html", {"request": request, "todo_list": dump_tasks}
+        )
     return JSONResponse(dump_tasks)
 
 
 async def create_task(request):
-    if 'authenticated' not in request.auth.scopes:
-        raise HTTPException(
-            status_code=HTTP_403_FORBIDDEN, detail="Authenticate first!"
-        )
+    print(request.headers)
     try:
-        curr_user_id = request.user.user_id
-        payload = await request.json()
-        task_name = payload['name']
-        description = payload['description']
+        content_type = request.headers['content-type']
+        if content_type == 'text/plain':
+            try:
+                curr_user_id = request.session['user_id']
+                email = request.session['email']
+                payload: bytes = await request.body()
+            except Exception:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail="Authenticate first!",
+                )
+            payload: str = payload.decode()
+            payload: list[str, ...] = payload.split()
+
+            task_name = payload[0].replace('name=', '')
+            description = payload[1].replace('description=', '')
+            try:
+                csrf_token = payload[2].replace('csrf_token=', '')
+            except Exception:
+                raise HTTPException(
+                    status_code=HTTP_400_BAD_REQUEST, detail="Can't parse csrf"
+                )
+            if csrf_token != 'pseudo_random':
+                raise HTTPException(
+                    status_code=HTTP_400_BAD_REQUEST, detail="Invalid csrf"
+                )
+        if content_type == 'application/json':
+            if 'authenticated' not in request.auth.scopes:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail="Authenticate first!",
+                )
+            curr_user_id = request.user.user_id
+            payload = await request.json()
+            task_name = payload['name']
+            description = payload['description']
     except JSONDecodeError:
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST, detail="Can't parse payload"
@@ -79,6 +122,11 @@ async def create_task(request):
     new_task = TaskService().create_task(
         name=task_name, description=description, list_id=curr_list_id
     )
+    if content_type == 'text/plain':
+        user = UserService().get_user_by_email(user_email=email)
+        return templates.TemplateResponse(
+            "home.html", {"request": request, "user": user, "id": new_task.id}
+        )
     return JSONResponse(new_task.model_dump())
 
 
