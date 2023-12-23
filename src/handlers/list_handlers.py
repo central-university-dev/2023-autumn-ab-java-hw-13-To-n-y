@@ -5,14 +5,28 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from starlette.templating import Jinja2Templates
 
+from src.security import get_csrf_token
 from src.services.list_service import ListService
+from src.services.user_service import UserService
 
 templates = Jinja2Templates(directory="frontend")
 
 
 async def homepage(request):
+    try:
+        curr_user_id = request.session['user_id']
+        csrf_token = get_csrf_token(curr_user_id)
+        curr_user = UserService().get_user_by_id(user_id=curr_user_id)
+    except Exception:
+        curr_user = None
+        csrf_token = 'None'
     return templates.TemplateResponse(
-        "home.html", {"request": request, "user": None}
+        "home.html",
+        {
+            "request": request,
+            "user": curr_user,
+            "csrf_token": csrf_token,
+        },  # Jinja2 защищает от xss
     )
 
 

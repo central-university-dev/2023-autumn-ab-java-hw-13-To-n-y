@@ -11,7 +11,7 @@ run:
 	uvicorn main:app --reload
 
 format:
-	poetry run black --line-length 79 --skip-string-normalization $(CODE_FOLDERS) $(TEST_FOLDERS)
+	poetry run black --line-length 79 --skip-string-normalization $(CODE_FOLDERS) main.py middleware.py
 
 lint:
 	poetry run flake8 --extend-ignore W291 src
@@ -20,4 +20,4 @@ test:
 	poetry run pytest
 
 run_bandit:
-	poetry run bandit -r src/ -f csv -o out.csv
+	poetry run bandit -r src/ -f csv

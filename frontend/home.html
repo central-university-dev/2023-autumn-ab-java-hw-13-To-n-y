@@ -19,6 +19,7 @@
             <input type="text" id="username" name="username" value="username...">
             <input type="text" id="email1" name="email" value="email...">
             <input type="text" id="password1" name="password" value="password...">
+            <input type="text" id="role1" name="role" value="user">
             <br>
         </div>
         <button class="ui blue button" type="submit">Register</button>
@@ -37,6 +38,9 @@
     <form class="ui form" action="/logout" method="post" enctype="text/plain">
         <button class="ui blue button" type="submit">Logout</button>
     </form>
+    <form class="ui form" action="/api/v1/task/all" method="post" enctype="text/plain">
+        <button class="ui blue button" type="submit">Get all todos(admin only)</button>
+    </form>
     <br>
     <br>
     <hr>
@@ -44,16 +48,13 @@
         <div class="field">
             <input type="text" id="name3" name="name" value="name...">
             <input type="text" id="description3" name="description" value="description...">
-            <input type="hidden" id="csrf_token" name="csrf_token" value="pseudo_random">
+            <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token }}">
             <br>
         </div>
         <button class="ui blue button" type="submit">Create todo</button>
     </form>
 
     <hr>
-    <form class="ui form" action="/api/v1/task/all" method="post" enctype="text/plain">
-        <button class="ui blue button" type="submit">Get all todos(admin only)</button>
-    </form>
 
 
 </div>

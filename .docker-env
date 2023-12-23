@@ -1,0 +1,5 @@
+DBPATH=C:\p_apps\hw_academy\2023-autumn-ab-java-hw-13-To-n-y\db\database.db
+SECRET=secret123
+ALGO=HS256
+A_EXP=30
+B_EXP=10000

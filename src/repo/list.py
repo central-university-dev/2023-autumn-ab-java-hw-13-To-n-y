@@ -3,7 +3,7 @@ from db.db import conn
 
 class ListRepo:
     def get_list_by_id(self, list_id: int) -> tuple:
-        req = '''SELECT * FROM task_list WHERE id = ?;'''
+        req = '''SELECT * FROM task_list WHERE id = ?;'''  # защита от инъекций
         cursor = conn.cursor()
         insert = (list_id,)
         curr_list = cursor.execute(req, insert).fetchone()

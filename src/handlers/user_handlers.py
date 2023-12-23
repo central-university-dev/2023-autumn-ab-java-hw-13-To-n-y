@@ -7,13 +7,17 @@ from starlette.templating import Jinja2Templates, _TemplateResponse
 
 from config import config
 from src.jwt_utils import create_token
-from src.security import get_hashed_password, verify_password
+from src.security import (
+    get_csrf_token,
+    get_hashed_password,
+    set_csrf_token,
+    verify_password,
+)
 from src.services.user_service import UserService
 
 templates = Jinja2Templates(directory="frontend")
 
 
-# 'content-type': 'multipart/form-data
 async def user_register(request) -> _TemplateResponse | JSONResponse:
     try:
         content_type = request.headers['content-type']
@@ -25,6 +29,7 @@ async def user_register(request) -> _TemplateResponse | JSONResponse:
             username = payload[0].replace('username=', '')
             email = payload[1].replace('email=', '')
             password = get_hashed_password(payload[2].replace('password=', ''))
+            role = payload[3].replace('role=', '')
 
             user_exist = UserService().get_user_by_email(user_email=email)
             if user_exist is not None:
@@ -33,15 +38,22 @@ async def user_register(request) -> _TemplateResponse | JSONResponse:
                     detail="Already registered",
                 )
             new_user = UserService().create_user(
-                name=username, email=email, role='user', password=password
+                name=username, email=email, role=role, password=password
             )
 
             request.session['email'] = email
             request.session['username'] = username
 
             user = UserService().get_user_by_email(user_email=email)
+            csrf_token = set_csrf_token(user_id=user.id)
             return templates.TemplateResponse(
-                "home.html", {"request": request, "user": user, "id": -1}
+                "home.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "id": -1,
+                    "csrf_token": csrf_token,
+                },
             )
 
         elif content_type == 'application/json':
@@ -100,11 +112,16 @@ async def user_login(request) -> _TemplateResponse | JSONResponse:
                     request.session['email'] = email
                     request.session['username'] = user.name
                     request.session['user_id'] = user.id
-                    print(request.session)
                     user = UserService().get_user_by_email(user_email=email)
+                    csrf_token = get_csrf_token(user.id)
                     return templates.TemplateResponse(
                         "home.html",
-                        {"request": request, "user": user, "id": -1},
+                        {
+                            "request": request,
+                            "user": user,
+                            "id": -1,
+                            "csrf_token": csrf_token,
+                        },
                     )
                 else:
                     raise HTTPException(

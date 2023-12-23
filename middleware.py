@@ -1,6 +1,10 @@
 import jwt
-from starlette.authentication import (AuthCredentials, AuthenticationBackend,
-                                      AuthenticationError, BaseUser)
+from starlette.authentication import (
+    AuthCredentials,
+    AuthenticationBackend,
+    AuthenticationError,
+    BaseUser,
+)
 from starlette.middleware import Middleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.middleware.cors import CORSMiddleware
@@ -12,7 +16,7 @@ from src.jwt_utils import decode_token
 
 class JWTUser(BaseUser):
     def __init__(
-            self, username: str, user_id: int, email: str, token: str, **kw
+        self, username: str, user_id: int, email: str, token: str, **kw
     ) -> None:
         self.username = username
         self.user_id = user_id
@@ -22,7 +26,7 @@ class JWTUser(BaseUser):
 
 class JWTAuthenticationBackend(AuthenticationBackend):
     def __init__(
-            self, secret_key: str, algorithm: str = "HS256", prefix: str = "Bearer"
+        self, secret_key: str, algorithm: str = "HS256", prefix: str = "Bearer"
     ):
         self.secret_key = secret_key
         self.algorithm = algorithm
@@ -33,9 +37,7 @@ class JWTAuthenticationBackend(AuthenticationBackend):
         try:
             token = authorization
         except ValueError:
-            raise AuthenticationError(
-                "Could not separate Authorization token"
-            )
+            raise AuthenticationError("Could not separate Authorization token")
         return token
 
     async def authenticate(self, request):

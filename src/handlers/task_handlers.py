@@ -5,6 +5,7 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from starlette.templating import Jinja2Templates
 
+from src.security import get_csrf_token
 from src.services.list_service import ListService
 from src.services.task_service import TaskService
 from src.services.user_service import UserService
@@ -36,9 +37,7 @@ async def task_by_id(request):
 
 
 async def all_tasks(request):
-    print(request.session)
     try:
-        print("START", request.headers)
         content_type = request.headers['content-type']
         if content_type == 'text/plain':
             curr_user_id = request.session['user_id']
@@ -68,7 +67,6 @@ async def all_tasks(request):
 
 
 async def create_task(request):
-    print(request.headers)
     try:
         content_type = request.headers['content-type']
         if content_type == 'text/plain':
@@ -92,7 +90,7 @@ async def create_task(request):
                 raise HTTPException(
                     status_code=HTTP_400_BAD_REQUEST, detail="Can't parse csrf"
                 )
-            if csrf_token != 'pseudo_random':
+            if csrf_token != get_csrf_token(curr_user_id):
                 raise HTTPException(
                     status_code=HTTP_400_BAD_REQUEST, detail="Invalid csrf"
                 )
@@ -125,7 +123,13 @@ async def create_task(request):
     if content_type == 'text/plain':
         user = UserService().get_user_by_email(user_email=email)
         return templates.TemplateResponse(
-            "home.html", {"request": request, "user": user, "id": new_task.id}
+            "home.html",
+            {
+                "request": request,
+                "user": user,
+                "id": new_task.id,
+                "csrf_token": get_csrf_token(user_id=curr_user_id),
+            },
         )
     return JSONResponse(new_task.model_dump())
 

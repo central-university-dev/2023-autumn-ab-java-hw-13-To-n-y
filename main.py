@@ -20,6 +20,7 @@ schemas = APISpecSchemaGenerator(
     )
 )
 
+
 @app.route("/schema", methods=["GET"], include_in_schema=False)
 def schema(request):
     return schemas.OpenAPIResponse(request=request)
@@ -27,4 +28,4 @@ def schema(request):
 
 if __name__ == "__main__":
     create_database()
-    uvicorn.run("main:app", port=5000, log_level="info")
+    uvicorn.run("main:app", host='0.0.0.0', port=8000, log_level="info")
