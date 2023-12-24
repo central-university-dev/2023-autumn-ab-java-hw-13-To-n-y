@@ -1,0 +1,29 @@
+FROM python:3.11
+
+
+ENV IN_CONTAINER 1
+
+WORKDIR /app
+
+RUN apt-get update
+RUN pip install poetry
+
+COPY pyproject.toml .
+COPY poetry.lock .
+COPY README.md .
+
+RUN poetry install --no-interaction --no-root
+
+
+COPY main.py ./
+COPY config.py ./
+COPY db/ ./db/
+COPY src/ ./src/
+COPY frontend/ ./frontend/
+COPY middleware.py ./
+
+
+ENTRYPOINT ["poetry", "run"]
+
+#CMD ["poetry", "run", "alembic", "upgrade", "head"]
+#CMD ["poetry", "run", "python", "observer_app.py"]

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+<body>
+<div>
+    <h1>Hello, {{ user.name }}, last todo id = {{ id }}</h1>
+</div>
+<div style="margin-top: 50px;" class="ui container">
+    <h1 class="ui center aligned header">ToDo App</h1>
+
+    <form class="ui form" action="/register" method="post" enctype="text/plain">
+        <div class="field">
+            <input type="text" id="username" name="username" value="username...">
+            <input type="text" id="email1" name="email" value="email...">
+            <input type="text" id="password1" name="password" value="password...">
+            <input type="text" id="role1" name="role" value="user">
+            <br>
+        </div>
+        <button class="ui blue button" type="submit">Register</button>
+    </form>
+    <br>
+    <br>
+    <hr>
+    <form class="ui form" action="/login" method="post" enctype="text/plain">
+        <div class="field">
+            <input type="text" id="email2" name="email" value="email...">
+            <input type="text" id="password2" name="password" value="password...">
+            <br>
+        </div>
+        <button class="ui blue button" type="submit">Login</button>
+    </form>
+    <form class="ui form" action="/logout" method="post" enctype="text/plain">
+        <button class="ui blue button" type="submit">Logout</button>
+    </form>
+    <form class="ui form" action="/api/v1/task/all" method="post" enctype="text/plain">
+        <button class="ui blue button" type="submit">Get all todos(admin only)</button>
+    </form>
+    <br>
+    <br>
+    <hr>
+    <form class="ui form" action="/api/v1/task" method="post" enctype="text/plain">
+        <div class="field">
+            <input type="text" id="name3" name="name" value="name...">
+            <input type="text" id="description3" name="description" value="description...">
+            <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token }}">
+            <br>
+        </div>
+        <button class="ui blue button" type="submit">Create todo</button>
+    </form>
+
+    <hr>
+
+
+</div>
+
+
+</body>
+
+</html>

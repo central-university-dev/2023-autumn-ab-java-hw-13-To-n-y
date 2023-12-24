@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  server:
+    build:
+      dockerfile: docker/Dockerfile.server
+    image: server_image
+    container_name: server_container
+    networks:
+      - internal
+    env_file:
+      - .docker-env
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    command: bash -c "poetry run python main.py"
+
+networks:
+  internal:
+    driver: bridge
