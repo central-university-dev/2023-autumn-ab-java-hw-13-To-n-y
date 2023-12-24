@@ -6,7 +6,6 @@ jobs:
   call-checks:
     uses: ./.github/workflows/checks.yml
 
-  tests:
   security_check:
     runs-on: ubuntu-latest
     needs: [ call-checks ]
