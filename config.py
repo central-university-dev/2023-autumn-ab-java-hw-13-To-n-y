@@ -25,6 +25,9 @@ class Config:
     B_EXP = os.environ.get(
         "B_EXP"
     )
+    CSRF_DEFAULT_TOKEN = os.environ.get(
+        "CSRF_DEFAULT_TOKEN"
+    )
 
 
 config = Config()

@@ -8,6 +8,7 @@ from starlette.templating import Jinja2Templates
 from src.security import get_csrf_token
 from src.services.list_service import ListService
 from src.services.user_service import UserService
+from config import config
 
 templates = Jinja2Templates(directory="frontend")
 
@@ -19,7 +20,7 @@ async def homepage(request):
         curr_user = UserService().get_user_by_id(user_id=curr_user_id)
     except Exception:
         curr_user = None
-        csrf_token = 'None'
+        csrf_token = config.CSRF_DEFAULT_TOKEN
     return templates.TemplateResponse(
         "home.html",
         {
